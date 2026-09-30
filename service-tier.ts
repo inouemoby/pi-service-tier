@@ -29,6 +29,7 @@ import {
   writeServiceTierConfigSnapshot,
 } from "./config.ts";
 import { createServiceTierSections } from "./settings.ts";
+import { registerCodexFastProvider } from "./codex-fast-provider.ts";
 import {
   SERVICE_TIER_SESSION_ENTRY,
   mergeServiceTierSettings,
@@ -70,7 +71,7 @@ function publishServiceTierState(
     provider,
     modelId,
     serviceTier,
-    fast: definition?.fastTier === serviceTier && serviceTier !== "",
+    fast: serviceTier !== "" && definition?.fastTier === serviceTier,
   });
 }
 
@@ -168,6 +169,8 @@ export default function (pi: ExtensionAPI) {
   const effectiveSettings = (
     defaults = loadConfigOrDefault(),
   ): ServiceTierSettings => mergeServiceTierSettings(defaults, sessionOverrides);
+
+  registerCodexFastProvider(pi, effectiveSettings);
 
   const refreshServiceTier = (
     ctx: ExtensionContext,

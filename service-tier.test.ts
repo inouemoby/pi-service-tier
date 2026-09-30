@@ -71,6 +71,7 @@ function setupExtension(sessionManager = SessionManager.inMemory()): {
   const notifications: CapturedNotification[] = [];
 
   serviceTierExtension({
+    registerProvider() {},
     appendEntry(customType: string, data: unknown) {
       sessionManager.appendCustomEntry(customType, data);
     },

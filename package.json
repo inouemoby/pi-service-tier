@@ -3,7 +3,12 @@
   "version": "0.4.0",
   "description": "Fast mode and provider service-tier controls for pi",
   "type": "module",
+  "dependencies": {
+    "https-proxy-agent": "^7.0.6",
+    "ws": "^8.22.0"
+  },
   "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
     "@earendil-works/pi-coding-agent": "*",
     "@earendil-works/pi-tui": "*",
     "typebox": "*"
@@ -15,6 +20,8 @@
     "config.ts",
     "settings.ts",
     "session-state.ts",
+    "codex-fast-transport.ts",
+    "codex-fast-provider.ts",
     "README.md",
     "screenshot.png",
     "LICENSE"
@@ -35,7 +42,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mavam/pi-service-tier.git"
+    "url": "git+https://github.com/inouemoby/pi-service-tier.git"
   },
   "engines": {
     "node": ">=24.0.0"
