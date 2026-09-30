@@ -107,9 +107,8 @@ whether the Fast WebSocket path completed, not proof of a backend SLA; it contai
 only provider/model identity, transport, originator and success flags, never
 credentials, prompts or response content.
 
-Do not use Codex's `default` echo as proof that Fast failed. The existing Codex
-Usage icon code is not changed by this fork: its `!` still represents that raw
-echo, which can remain `default` even when measured Fast throughput improves.
+Do not use Codex's `default` echo as proof that Fast failed. Codex Usage displays
+only `⚡` to reflect the Fast setting, without a response-tier warning marker.
 
 ## 🧩 Footer widget
 
@@ -124,11 +123,9 @@ and no fill behavior by default. The extension has no package dependency on the
 footer: it publishes a complete snapshot when its state changes and republishes
 when the footer announces that it is ready.
 
-When the customized `pi-codex-usage` extension is also installed, its model-name
-marker follows the final provider response: `⚡` when the response reports the
-fast tier, and `!⚡` when it explicitly reports a non-fast tier. Missing tier
-metadata is treated as unknown and does not show `!`. The marker reflects
-response metadata rather than independently verifying remote processing; it is
+When the customized `pi-codex-usage` extension is also installed, it displays
+`⚡` directly against the model name while Fast is enabled for that provider/model.
+It does not interpret response-tier metadata as a failure. The marker is
 display-only and does not change the model ID or request.
 
 ## 📝 TODO
