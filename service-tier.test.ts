@@ -552,34 +552,6 @@ test("publishes the effective fast state for footer integrations", async () =>
     });
   }));
 
-test("reports whether a fast provider request carries its tier", async () =>
-  withAgentDir(async () => {
-    const harness = setupExtension();
-    await toggle(harness);
-    assert.deepEqual(await request(harness), {
-      model: codexModel?.id,
-      service_tier: "priority",
-    });
-    const requestEvents = () => harness.extensionEvents.filter(
-      (entry) => entry.event === "pi-service-tier:request",
-    );
-    assert.deepEqual(requestEvents().at(-1)?.payload, {
-      provider: "openai-codex",
-      modelId: "gpt-5.5-codex",
-      fast: true,
-      applied: true,
-    });
-
-    await toggle(harness);
-    assert.deepEqual(await request(harness), { model: codexModel?.id });
-    assert.deepEqual(requestEvents().at(-1)?.payload, {
-      provider: "openai-codex",
-      modelId: "gpt-5.5-codex",
-      fast: false,
-      applied: false,
-    });
-  }));
-
 test("fancy footer keeps an inactive widget configurable with empty text", async () =>
   withAgentDir(async (dir) => {
     writeFileSync(

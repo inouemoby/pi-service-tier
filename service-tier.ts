@@ -14,7 +14,6 @@ import {
   DEFAULT_SERVICE_TIER_CONFIG,
   SERVICE_TIER_PROVIDER_DEFINITIONS,
   applyServiceTierToPayload,
-  isRecord,
   isServiceTierProvider,
   resolveEffectiveServiceTier,
   setProviderServiceTier,
@@ -40,7 +39,6 @@ import {
 
 export const SERVICE_TIER_WIDGET_ID = "pi-service-tier.service-tier";
 export const SERVICE_TIER_STATE_EVENT = "pi-service-tier:state";
-export const SERVICE_TIER_REQUEST_EVENT = "pi-service-tier:request";
 
 const FANCY_FOOTER_PROTOCOL = 1;
 const FANCY_FOOTER_WIDGET_EVENT = "pi-fancy-footer:widget";
@@ -54,40 +52,6 @@ function warnOnce(message: string, lastWarning: string): string {
 function formatModel(model: ExtensionContext["model"]): string {
   if (!model) return "the current model";
   return `${model.provider}/${model.id}`;
-}
-
-function publishServiceTierRequest(
-  pi: ExtensionAPI,
-  ctx: ExtensionContext,
-  serviceTier: ServiceTierSelection,
-  payload: unknown,
-): void {
-  const provider =
-    typeof ctx.model?.provider === "string" ? ctx.model.provider : null;
-  const modelId = typeof ctx.model?.id === "string" ? ctx.model.id : null;
-  const definition = isServiceTierProvider(provider)
-    ? SERVICE_TIER_PROVIDER_DEFINITIONS[provider]
-    : undefined;
-  const fast = definition?.fastTier === serviceTier && serviceTier !== "";
-  const expectedValue = definition?.tiers.find(
-    (tier) => tier.name === serviceTier,
-  )?.value;
-  const applied = Boolean(
-    fast &&
-      expectedValue !== undefined &&
-      (provider === "google" || provider === "google-vertex"
-        ? isRecord(payload) &&
-          isRecord(payload.config) &&
-          payload.config.serviceTier === expectedValue
-        : isRecord(payload) && payload.service_tier === expectedValue),
-  );
-
-  pi.events.emit(SERVICE_TIER_REQUEST_EVENT, {
-    provider,
-    modelId,
-    fast,
-    applied,
-  });
 }
 
 function publishServiceTierState(
@@ -354,14 +318,7 @@ export default function (pi: ExtensionAPI) {
   pi.on("before_provider_request", async (event, ctx) => {
     const config = effectiveSettings();
     refreshServiceTier(ctx, config);
-    const payload = applyServiceTierToPayload(event.payload, config, ctx.model);
-    publishServiceTierRequest(
-      pi,
-      ctx,
-      currentServiceTier,
-      payload ?? event.payload,
-    );
-    return payload;
+    return applyServiceTierToPayload(event.payload, config, ctx.model);
   });
 
   pi.on("session_shutdown", async () => {
