@@ -91,9 +91,10 @@ when the footer announces that it is ready.
 
 When the customized `pi-codex-usage` extension is also installed, its model-name
 marker follows the final provider response: `⚡` when the response reports the
-fast tier, or `!⚡` otherwise. This reflects returned response metadata and is not
-an independent verification of remote processing. The marker is display-only; it
-does not change the model ID or request.
+fast tier, and `!⚡` when it explicitly reports a non-fast tier. Missing tier
+metadata is treated as unknown and does not show `!`. The marker reflects
+response metadata rather than independently verifying remote processing; it is
+display-only and does not change the model ID or request.
 
 ## 📝 TODO
 
