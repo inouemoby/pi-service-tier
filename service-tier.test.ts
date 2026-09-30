@@ -516,6 +516,42 @@ test("fancy footer receives a complete snapshot for an active tier", async () =>
     });
   }));
 
+test("publishes the effective fast state for footer integrations", async () =>
+  withAgentDir(async () => {
+    const harness = setupExtension();
+    const stateEvents = () => harness.extensionEvents.filter(
+      (entry) => entry.event === "pi-service-tier:state",
+    );
+
+    await harness.emitPiEvent(
+      "session_start",
+      { type: "session_start" },
+      harness.context(codexModel),
+    );
+    assert.deepEqual(stateEvents().at(-1)?.payload, {
+      provider: "openai-codex",
+      modelId: "gpt-5.5-codex",
+      serviceTier: "",
+      fast: false,
+    });
+
+    await toggle(harness);
+    assert.deepEqual(stateEvents().at(-1)?.payload, {
+      provider: "openai-codex",
+      modelId: "gpt-5.5-codex",
+      serviceTier: "priority",
+      fast: true,
+    });
+
+    await toggle(harness);
+    assert.deepEqual(stateEvents().at(-1)?.payload, {
+      provider: "openai-codex",
+      modelId: "gpt-5.5-codex",
+      serviceTier: "",
+      fast: false,
+    });
+  }));
+
 test("fancy footer keeps an inactive widget configurable with empty text", async () =>
   withAgentDir(async (dir) => {
     writeFileSync(
@@ -602,9 +638,9 @@ async function request(harness: Harness, model = codexModel) {
 }
 
 function footerText(harness: Harness): string {
-  const last = harness.extensionEvents.at(-1)!.payload as {
-    widget: { content: { text: string } };
-  };
+  const last = harness.extensionEvents
+    .filter((entry) => entry.event === "pi-fancy-footer:widget")
+    .at(-1)!.payload as { widget: { content: { text: string } } };
   return last.widget.content.text;
 }
 

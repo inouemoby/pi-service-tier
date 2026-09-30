@@ -38,6 +38,7 @@ import {
 } from "./session-state.ts";
 
 export const SERVICE_TIER_WIDGET_ID = "pi-service-tier.service-tier";
+export const SERVICE_TIER_STATE_EVENT = "pi-service-tier:state";
 
 const FANCY_FOOTER_PROTOCOL = 1;
 const FANCY_FOOTER_WIDGET_EVENT = "pi-fancy-footer:widget";
@@ -51,6 +52,26 @@ function warnOnce(message: string, lastWarning: string): string {
 function formatModel(model: ExtensionContext["model"]): string {
   if (!model) return "the current model";
   return `${model.provider}/${model.id}`;
+}
+
+function publishServiceTierState(
+  pi: ExtensionAPI,
+  ctx: ExtensionContext,
+  serviceTier: ServiceTierSelection,
+): void {
+  const provider =
+    typeof ctx.model?.provider === "string" ? ctx.model.provider : null;
+  const modelId = typeof ctx.model?.id === "string" ? ctx.model.id : null;
+  const definition = isServiceTierProvider(provider)
+    ? SERVICE_TIER_PROVIDER_DEFINITIONS[provider]
+    : undefined;
+
+  pi.events.emit(SERVICE_TIER_STATE_EVENT, {
+    provider,
+    modelId,
+    serviceTier,
+    fast: definition?.fastTier === serviceTier && serviceTier !== "",
+  });
 }
 
 function notifyConfigWriteError(ctx: ExtensionCommandContext, error: unknown): void {
@@ -155,10 +176,12 @@ export default function (pi: ExtensionAPI) {
   ): ServiceTierSelection => {
     const nextServiceTier = resolveEffectiveServiceTier(config, ctx.model);
     if (currentServiceTier === nextServiceTier && !forceRefresh) {
+      publishServiceTierState(pi, ctx, currentServiceTier);
       return currentServiceTier;
     }
 
     currentServiceTier = nextServiceTier;
+    publishServiceTierState(pi, ctx, currentServiceTier);
     publishFancyFooterWidget();
     return currentServiceTier;
   };

@@ -18,6 +18,8 @@ pi install npm:pi-service-tier
 - Adds `/service-tier` to configure global defaults for all supported providers
   from an interactive modal
 - Adds an optional service tier widget when `pi-fancy-footer` is installed
+- Publishes active tier state for cooperating footer extensions, including the
+  customized `pi-codex-usage` model-name marker
 
 ## 🚀 Commands
 
@@ -87,6 +89,10 @@ The widget id is `pi-service-tier.service-tier`. It uses the current
 and no fill behavior by default. The extension has no package dependency on the
 footer: it publishes a complete snapshot when its state changes and republishes
 when the footer announces that it is ready.
+
+When the customized `pi-codex-usage` extension is also installed, the model name
+in its footer gains a trailing `⚡` while the active model's effective tier is its
+fast tier. This is display-only; it does not change the model ID or request.
 
 ## 📝 TODO
 
